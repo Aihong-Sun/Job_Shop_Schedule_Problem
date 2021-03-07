@@ -7,7 +7,7 @@ import numpy as np
 
 from ._generate_neighbor import generate_neighbor
 from ..exception import InfeasibleSolutionException
-from ..util import get_stop_condition, Heap
+from ..util import get_stop_condition, Heap, SolutionSet
 
 
 class TabuSearchAgent:
@@ -98,7 +98,7 @@ class TabuSearchAgent:
         :returns: Neighboring Solutions
         """
         stop_time = time.time() + self.neighborhood_wait
-        neighborhood = _SolutionSet()
+        neighborhood = SolutionSet()
         while neighborhood.size < self.neighborhood_size and time.time() < stop_time:
             try:
                 neighbor = generate_neighbor(seed_solution, self.probability_change_machine,
@@ -242,7 +242,7 @@ class _TabuList(Queue):
     """
     def __init__(self, max_size=0):
         super().__init__(max_size)
-        self.solutions = _SolutionSet()
+        self.solutions = SolutionSet()
 
     def put(self, solution, block=True, timeout=None):
         super().put(solution, block, timeout)
@@ -260,54 +260,3 @@ class _TabuList(Queue):
         return self.solutions.size
 
 
-class _SolutionSet:
-    """
-    Set for containing Solution instances.
-    """
-    def __init__(self):
-        self.size = 0
-        self.solutions = {}
-
-    def add(self, solution):
-        """
-        Adds a solution and increments size.
-
-        :type solution: Solution
-        :param solution: solution to add
-
-        :returns: None
-        """
-        if solution.makespan not in self.solutions:
-            self.solutions[solution.makespan] = [solution]
-        else:
-            self.solutions[solution.makespan].append(solution)
-
-        self.size += 1
-
-    def remove(self, solution):
-        """
-        Removes a solution and decrements size.
-
-        :type solution: Solution
-        :param solution: solution to remove
-
-        :returns: None
-        """
-        if len(self.solutions[solution.makespan]) == 1:
-            del self.solutions[solution.makespan]
-        else:
-            self.solutions[solution.makespan].remove(solution)
-
-        self.size -= 1
-
-    def __contains__(self, solution):
-        """
-        Returns true if the solution is in this _SolutionSet.
-
-        :type solution: Solution
-        :param solution: solution to look for
-
-        :rtype: bool
-        :returns: true if the solution is in this _SolutionSet
-        """
-        return solution.makespan in self.solutions and solution in self.solutions[solution.makespan]

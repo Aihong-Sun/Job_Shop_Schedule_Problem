@@ -1,14 +1,14 @@
 import unittest
 
-from JSSP.tabu_search.ts import _SolutionSet, _TabuList
-from JSSP.util import Heap
+from JSSP.tabu_search.ts import _TabuList
+from JSSP.util import Heap, SolutionSet
 from tests.util import csv_data_solution_factory
 
 
 class TestTSStructures(unittest.TestCase):
 
     def test_solution_set_add(self):
-        solution_set = _SolutionSet()
+        solution_set = SolutionSet()
 
         # add a Solution
         solution_obj1 = csv_data_solution_factory.get_solution()
@@ -27,7 +27,7 @@ class TestTSStructures(unittest.TestCase):
         self.assertEqual(solution_set.size, 2)
 
     def test_solution_set_remove(self):
-        solution_set = _SolutionSet()
+        solution_set = SolutionSet()
 
         # add a Solution
         solution_obj1 = csv_data_solution_factory.get_solution()
